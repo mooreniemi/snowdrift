@@ -34,6 +34,7 @@ discussionSpecs = do
                 addPostParam "mode" "post"
                 stmts
 
+            --because we return to discussion, no 201
             statusIsResp 302
 
         getLatestCommentId = do
@@ -79,6 +80,19 @@ discussionSpecs = do
 
             statusIsResp 302
 
+        yit "deletes a posted parent comment (topic)" $ do
+            login
+
+            liftIO $ putStrLn "posting root comment"
+
+            postComment (NewDiscussWikiR "snowdrift" "about") $ byLabel "New Topic" "Thread 1 - root message"
+
+            statusIs 302
+
+            comment <- getLatestCommentId
+            post (DeleteCommentR "snowdrift" "about" comment)
+
+            statusIs 302
 
     ydescribe "discussion - rethreading" $ do
         let createComments = do
